@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:github.com)",
+      "Bash(mvn clean package:*)",
+      "Bash(cmd /c \"cd /d \"\"C:\\\\Users\\\\Carrick Remillard\\\\Desktop\\\\LakeLogger\"\" && mvn clean package -q\")",
+      "Bash(cmd /c \"dir \"\"C:\\\\Users\\\\Carrick Remillard\\\\Desktop\\\\LakeLogger\\\\target\\\\*.jar\"\" 2>&1\")",
+      "Bash(cmd /c \"dir /s \"\"C:\\\\Users\\\\Carrick Remillard\\\\Desktop\\\\LakeLogger\\\\target\"\"\")",
+      "Bash(cmd /c \"cd /d \"\"C:\\\\Users\\\\Carrick Remillard\\\\Desktop\\\\LakeLogger\"\" && mvn clean package\")",
+      "Bash(cmd.exe:*)",
+      "Bash(powershell -Command \"cd ''C:\\\\Users\\\\Carrick Remillard\\\\Desktop\\\\LakeLogger''; mvn --version\")",
+      "Bash(powershell:*)",
+      "Bash(mvn compile:*)",
+      "Bash(mvn package:*)",
+      "Bash(dir:*)",
+      "Bash(java:*)",
+      "Bash(scriptsbuild.bat)"
+    ]
+  }
+}
