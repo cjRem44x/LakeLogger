@@ -1,4 +1,4 @@
-# Lake Logger
+# 🎣 Lake Logger
 
 A sleek, dark-themed desktop application for bass fishing enthusiasts to log catches, track patterns, and analyze fishing data.
 
@@ -6,43 +6,43 @@ A sleek, dark-themed desktop application for bass fishing enthusiasts to log cat
 ![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
-## Features
+## ✨ Features
 
-### Log Catches
-- Date and time of catch
-- Bass weight (lbs) and length (inches)
-- Location (custom, saved for reuse)
-- Weather conditions and temperature
-- Bait/lure used (custom, saved for reuse)
-- Personal notes
+### 📝 Log Catches
+- 📅 Date and time of catch
+- ⚖️ Bass weight (lbs) and length (inches)
+- 📍 Location (custom, saved for reuse)
+- 🌤️ Weather conditions and temperature
+- 🪱 Bait/lure used (custom, saved for reuse)
+- 📓 Personal notes
 
-### View & Manage
-- Sortable data table with all catches
-- Filter by date range, location, or bait
-- Edit or delete entries
-- Export to CSV for external analysis
+### 📋 View & Manage
+- 🔀 Sortable data table with all catches
+- 🔍 Filter by date range, location, or bait
+- ✏️ Edit or delete entries
+- 📤 Export to CSV for external analysis
 
-### Analytics Dashboard
-- **Summary Stats**: Total catches, weights, averages, personal bests
-- **Bait Analysis**: Which baits catch the most/biggest fish
-- **Time Patterns**: Best times of day to fish
-- **Weather Insights**: Catch rates by weather conditions
-- **Location Comparison**: Performance across fishing spots
+### 📊 Analytics Dashboard
+- **Summary Stats**: Total catches, weights, averages, personal bests 🏆
+- **Bait Analysis**: Which baits catch the most/biggest fish 🪱
+- **Time Patterns**: Best times of day to fish ⏰
+- **Weather Insights**: Catch rates by weather conditions 🌦️
+- **Location Comparison**: Performance across fishing spots 🗺️
 
-### Modern UI
-- Dark theme with green accents
-- Animated background with floating particles
-- Custom-styled components (buttons, dropdowns, scrollbars)
-- Responsive layout
+### 🎨 Modern UI
+- 🌙 Dark theme with green accents
+- ✨ Animated background with floating particles
+- 🎯 Custom-styled components (buttons, dropdowns, scrollbars)
+- 📱 Responsive layout
 
-## Requirements
+## 📋 Requirements
 
-- **Java 17** or later
-- **Maven 3.6+** (for building from source)
+- ☕ **Java 17** or later
+- 📦 **Maven 3.6+** (for building from source)
 
-## Quick Start
+## 🚀 Quick Start
 
-### Windows
+### 🪟 Windows
 
 ```batch
 # Build
@@ -52,7 +52,7 @@ scripts\build.bat
 scripts\run.bat
 ```
 
-### macOS / Linux
+### 🍎 macOS / 🐧 Linux
 
 ```bash
 # Make scripts executable (first time only)
@@ -65,7 +65,7 @@ chmod +x scripts/*.sh
 ./scripts/run.sh
 ```
 
-### Manual Build
+### 🔧 Manual Build
 
 ```bash
 # Build the application
@@ -75,7 +75,7 @@ mvn clean package
 java --enable-native-access=ALL-UNNAMED -jar target/LakeLogger.jar
 ```
 
-## Project Structure
+## 📁 Project Structure
 
 ```
 LakeLogger/
@@ -111,34 +111,34 @@ LakeLogger/
 └── README.md
 ```
 
-## Database
+## 🗄️ Database
 
 Lake Logger uses SQLite for local data storage. The database file is created automatically at:
 
 | Platform | Location |
 |----------|----------|
-| Windows  | `%USERPROFILE%\.lakelogger\lakelogger.db` |
-| macOS    | `~/.lakelogger/lakelogger.db` |
-| Linux    | `~/.lakelogger/lakelogger.db` |
+| 🪟 Windows  | `%USERPROFILE%\.lakelogger\lakelogger.db` |
+| 🍎 macOS    | `~/.lakelogger/lakelogger.db` |
+| 🐧 Linux    | `~/.lakelogger/lakelogger.db` |
 
-### Backup
+### 💾 Backup
 
 To backup your data, simply copy the `lakelogger.db` file to a safe location.
 
-## Theme Colors
+## 🎨 Theme Colors
 
 | Color | Hex | Usage |
 |-------|-----|-------|
-| Background | `#0f1214` | Main background |
-| Card | `#1e2428` | Panel backgrounds |
-| Primary | `#1b4d3e` | Forest green accents |
-| Success | `#10b981` | Emerald green highlights |
-| Info | `#06b6d4` | Cyan/water blue |
-| Warning | `#f59e0b` | Amber accents |
-| Danger | `#ef4444` | Red for delete/errors |
-| Text | `#f0f4f8` | Primary text |
+| 🖤 Background | `#0f1214` | Main background |
+| 🃏 Card | `#1e2428` | Panel backgrounds |
+| 🌲 Primary | `#1b4d3e` | Forest green accents |
+| 💚 Success | `#10b981` | Emerald green highlights |
+| 💎 Info | `#06b6d4` | Cyan/water blue |
+| 🔶 Warning | `#f59e0b` | Amber accents |
+| ❌ Danger | `#ef4444` | Red for delete/errors |
+| 📝 Text | `#f0f4f8` | Primary text |
 
-## Dependencies
+## 📚 Dependencies
 
 | Library | Version | Purpose |
 |---------|---------|---------|
@@ -146,38 +146,38 @@ To backup your data, simply copy the `lakelogger.db` file to a safe location.
 | JCalendar | 1.4 | Date picker component |
 | JFreeChart | 1.5.4 | Analytics charts |
 
-## Troubleshooting
+## 🔧 Troubleshooting
 
-### "Maven not found"
+### ❓ "Maven not found"
 Install Maven from [maven.apache.org](https://maven.apache.org/download.cgi) and add it to your PATH.
 
-### "Java not found"
+### ❓ "Java not found"
 Install Java 17+ from [adoptium.net](https://adoptium.net/) and add it to your PATH.
 
-### SQLite warnings on startup
+### ⚠️ SQLite warnings on startup
 These are harmless warnings from the SQLite driver. The run scripts include `--enable-native-access=ALL-UNNAMED` to suppress them.
 
-### Database location
+### 🗑️ Database location
 If you need to reset the app, delete the `.lakelogger` folder in your home directory.
 
-## Contributing
+## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+1. 🍴 Fork the repository
+2. 🌿 Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. 💾 Commit your changes (`git commit -m 'Add amazing feature'`)
+4. 📤 Push to the branch (`git push origin feature/amazing-feature`)
+5. 🔃 Open a Pull Request
 
-## License
+## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Acknowledgments
+## 🙏 Acknowledgments
 
-- Built with Java Swing
-- Icons and graphics designed for outdoor/fishing aesthetic
-- Inspired by the need to track bass fishing patterns
+- ☕ Built with Java Swing
+- 🎨 Icons and graphics designed for outdoor/fishing aesthetic
+- 🐟 Inspired by the need to track bass fishing patterns
 
 ---
 
-**Happy Fishing!** 🎣
+**Happy Fishing!** 🎣🐟🌊
