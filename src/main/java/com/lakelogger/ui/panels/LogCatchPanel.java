@@ -286,10 +286,10 @@ public class LogCatchPanel extends JPanel {
     }
 
     private void addNewLocation() {
-        String newLocation = JOptionPane.showInputDialog(this,
+        String newLocation = DarkTheme.showInput(this,
                 "Enter new location name:",
                 "Add Location",
-                JOptionPane.PLAIN_MESSAGE);
+                null);
 
         if (newLocation != null && !newLocation.trim().isEmpty()) {
             catchDAO.saveLocation(new Location(newLocation.trim()));
@@ -299,10 +299,10 @@ public class LogCatchPanel extends JPanel {
     }
 
     private void addNewBait() {
-        String newBait = JOptionPane.showInputDialog(this,
+        String newBait = DarkTheme.showInput(this,
                 "Enter new bait name:",
                 "Add Bait",
-                JOptionPane.PLAIN_MESSAGE);
+                null);
 
         if (newBait != null && !newBait.trim().isEmpty()) {
             catchDAO.saveBait(new Bait(newBait.trim()));
@@ -361,7 +361,7 @@ public class LogCatchPanel extends JPanel {
             int id = catchDAO.saveCatch(entry);
 
             if (id > 0) {
-                JOptionPane.showMessageDialog(this,
+                DarkTheme.showMessage(this,
                         String.format("Catch logged successfully!\n\n%.1f\" / %.2f lb %s on %s",
                                 entry.getBassLengthInches(),
                                 entry.getBassWeightLbs(),
@@ -376,14 +376,14 @@ public class LogCatchPanel extends JPanel {
                     onCatchSaved.run();
                 }
             } else {
-                JOptionPane.showMessageDialog(this,
+                DarkTheme.showMessage(this,
                         "Failed to save catch. Please try again.",
                         "Error",
                         JOptionPane.ERROR_MESSAGE);
             }
 
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this,
+            DarkTheme.showMessage(this,
                     "Error saving catch: " + ex.getMessage(),
                     "Error",
                     JOptionPane.ERROR_MESSAGE);

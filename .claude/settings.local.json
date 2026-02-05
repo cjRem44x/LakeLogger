@@ -14,7 +14,9 @@
       "Bash(mvn package:*)",
       "Bash(dir:*)",
       "Bash(java:*)",
-      "Bash(scriptsbuild.bat)"
+      "Bash(scriptsbuild.bat)",
+      "Bash(start /B mvn exec:java:*)",
+      "Bash(mvn exec:java:*)"
     ]
   }
 }

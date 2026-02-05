@@ -267,7 +267,7 @@ public class ViewCatchesPanel extends JPanel {
     private void editSelectedCatch() {
         int selectedRow = catchTable.getSelectedRow();
         if (selectedRow < 0) {
-            JOptionPane.showMessageDialog(this, "Please select a catch to edit.", "No Selection", JOptionPane.WARNING_MESSAGE);
+            DarkTheme.showMessage(this, "Please select a catch to edit.", "No Selection", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
@@ -276,7 +276,7 @@ public class ViewCatchesPanel extends JPanel {
         CatchEntry entry = catchDAO.getCatchById(catchId);
 
         if (entry == null) {
-            JOptionPane.showMessageDialog(this, "Could not load catch data.", "Error", JOptionPane.ERROR_MESSAGE);
+            DarkTheme.showMessage(this, "Could not load catch data.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -416,11 +416,11 @@ public class ViewCatchesPanel extends JPanel {
             entry.setNotes(notesEdit.getText());
 
             if (catchDAO.updateCatch(entry)) {
-                JOptionPane.showMessageDialog(dialog, "Catch updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                DarkTheme.showMessage(dialog, "Catch updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
                 dialog.dispose();
                 loadCatches();
             } else {
-                JOptionPane.showMessageDialog(dialog, "Failed to update catch.", "Error", JOptionPane.ERROR_MESSAGE);
+                DarkTheme.showMessage(dialog, "Failed to update catch.", "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
         btnPanel.add(saveBtn);
@@ -438,32 +438,31 @@ public class ViewCatchesPanel extends JPanel {
     private void deleteSelectedCatch() {
         int selectedRow = catchTable.getSelectedRow();
         if (selectedRow < 0) {
-            JOptionPane.showMessageDialog(this, "Please select a catch to delete.", "No Selection", JOptionPane.WARNING_MESSAGE);
+            DarkTheme.showMessage(this, "Please select a catch to delete.", "No Selection", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        int confirm = JOptionPane.showConfirmDialog(this,
+        int confirm = DarkTheme.showConfirm(this,
                 "Are you sure you want to delete this catch?",
                 "Confirm Delete",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.WARNING_MESSAGE);
+                JOptionPane.YES_NO_OPTION);
 
         if (confirm == JOptionPane.YES_OPTION) {
             int modelRow = catchTable.convertRowIndexToModel(selectedRow);
             int catchId = (Integer) tableModel.getValueAt(modelRow, 0);
 
             if (catchDAO.deleteCatch(catchId)) {
-                JOptionPane.showMessageDialog(this, "Catch deleted successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                DarkTheme.showMessage(this, "Catch deleted successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
                 loadCatches();
             } else {
-                JOptionPane.showMessageDialog(this, "Failed to delete catch.", "Error", JOptionPane.ERROR_MESSAGE);
+                DarkTheme.showMessage(this, "Failed to delete catch.", "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
 
     private void exportToCsv() {
         if (currentCatches == null || currentCatches.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "No catches to export.", "Info", JOptionPane.INFORMATION_MESSAGE);
+            DarkTheme.showMessage(this, "No catches to export.", "Info", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
 
@@ -479,12 +478,12 @@ public class ViewCatchesPanel extends JPanel {
 
             try (FileWriter writer = new FileWriter(file)) {
                 writer.write(catchDAO.exportToCsv(currentCatches));
-                JOptionPane.showMessageDialog(this,
+                DarkTheme.showMessage(this,
                         "Exported " + currentCatches.size() + " catches to:\n" + file.getAbsolutePath(),
                         "Export Complete",
                         JOptionPane.INFORMATION_MESSAGE);
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this,
+                DarkTheme.showMessage(this,
                         "Error exporting: " + ex.getMessage(),
                         "Export Error",
                         JOptionPane.ERROR_MESSAGE);

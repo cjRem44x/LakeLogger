@@ -259,6 +259,129 @@ public class DarkTheme {
         UIManager.put("ToggleButton.background", new ColorUIResource(BACKGROUND_TERTIARY));
         UIManager.put("ToggleButton.foreground", new ColorUIResource(TEXT_PRIMARY));
         UIManager.put("ToggleButton.select", new ColorUIResource(PRIMARY));
+
+        // ComboBox popup list styling (critical for dark theme)
+        UIManager.put("ComboBox.listBackground", new ColorUIResource(BACKGROUND_SECONDARY));
+        UIManager.put("ComboBox.listForeground", new ColorUIResource(TEXT_PRIMARY));
+        UIManager.put("PopupMenu.background", new ColorUIResource(BACKGROUND_SECONDARY));
+        UIManager.put("PopupMenu.foreground", new ColorUIResource(TEXT_PRIMARY));
+        UIManager.put("PopupMenu.border", BorderFactory.createLineBorder(BORDER));
+    }
+
+    /**
+     * Show a styled message dialog (replacement for JOptionPane.showMessageDialog).
+     */
+    public static void showMessage(Component parent, String message, String title, int messageType) {
+        JOptionPane pane = new JOptionPane(message, messageType);
+        styleOptionPane(pane);
+        JDialog dialog = pane.createDialog(parent, title);
+        dialog.setBackground(BACKGROUND_SECONDARY);
+        dialog.getContentPane().setBackground(BACKGROUND_SECONDARY);
+        dialog.setVisible(true);
+    }
+
+    /**
+     * Show a styled confirmation dialog (replacement for JOptionPane.showConfirmDialog).
+     */
+    public static int showConfirm(Component parent, String message, String title, int optionType) {
+        JOptionPane pane = new JOptionPane(message, JOptionPane.QUESTION_MESSAGE, optionType);
+        styleOptionPane(pane);
+        JDialog dialog = pane.createDialog(parent, title);
+        dialog.setBackground(BACKGROUND_SECONDARY);
+        dialog.getContentPane().setBackground(BACKGROUND_SECONDARY);
+        dialog.setVisible(true);
+        Object value = pane.getValue();
+        if (value == null) {
+            return JOptionPane.CLOSED_OPTION;
+        }
+        if (value instanceof Integer) {
+            return (Integer) value;
+        }
+        return JOptionPane.CLOSED_OPTION;
+    }
+
+    /**
+     * Show a styled input dialog (replacement for JOptionPane.showInputDialog).
+     */
+    public static String showInput(Component parent, String message, String title, String initialValue) {
+        JTextField inputField = createTextField();
+        if (initialValue != null) {
+            inputField.setText(initialValue);
+        }
+        inputField.setPreferredSize(new Dimension(250, 35));
+
+        JPanel panel = new JPanel(new BorderLayout(10, 10));
+        panel.setBackground(BACKGROUND_SECONDARY);
+        JLabel label = createLabel(message);
+        panel.add(label, BorderLayout.NORTH);
+        panel.add(inputField, BorderLayout.CENTER);
+
+        JOptionPane pane = new JOptionPane(panel, JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION);
+        styleOptionPane(pane);
+        JDialog dialog = pane.createDialog(parent, title);
+        dialog.setBackground(BACKGROUND_SECONDARY);
+        dialog.getContentPane().setBackground(BACKGROUND_SECONDARY);
+        dialog.setVisible(true);
+
+        Object value = pane.getValue();
+        if (value != null && value instanceof Integer && (Integer) value == JOptionPane.OK_OPTION) {
+            return inputField.getText();
+        }
+        return null;
+    }
+
+    /**
+     * Style a JOptionPane and its child components.
+     */
+    private static void styleOptionPane(JOptionPane pane) {
+        pane.setBackground(BACKGROUND_SECONDARY);
+        pane.setForeground(TEXT_PRIMARY);
+        styleOptionPaneRecursive(pane);
+    }
+
+    /**
+     * Recursively style all components in an OptionPane.
+     */
+    private static void styleOptionPaneRecursive(Component comp) {
+        if (comp == null) return;
+
+        comp.setBackground(BACKGROUND_SECONDARY);
+        if (comp instanceof JComponent) {
+            ((JComponent) comp).setOpaque(true);
+        }
+
+        if (comp instanceof JButton) {
+            JButton btn = (JButton) comp;
+            // Replace with styled button appearance
+            btn.setBackground(PRIMARY);
+            btn.setForeground(TEXT_PRIMARY);
+            btn.setFont(new Font(EMOJI_FONT_NAME, Font.BOLD, 12));
+            btn.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(BORDER),
+                BorderFactory.createEmptyBorder(8, 16, 8, 16)));
+            btn.setFocusPainted(false);
+            btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+            // Add hover effect
+            btn.addMouseListener(new java.awt.event.MouseAdapter() {
+                public void mouseEntered(java.awt.event.MouseEvent e) {
+                    btn.setBackground(PRIMARY_HOVER);
+                }
+                public void mouseExited(java.awt.event.MouseEvent e) {
+                    btn.setBackground(PRIMARY);
+                }
+            });
+        } else if (comp instanceof JLabel) {
+            ((JLabel) comp).setForeground(TEXT_PRIMARY);
+        } else if (comp instanceof JPanel) {
+            ((JPanel) comp).setBackground(BACKGROUND_SECONDARY);
+        }
+
+        if (comp instanceof Container) {
+            for (Component child : ((Container) comp).getComponents()) {
+                styleOptionPaneRecursive(child);
+            }
+        }
     }
 
     /**
@@ -371,33 +494,188 @@ public class DarkTheme {
         // Style all child components recursively
         styleComponentRecursive(dateChooser);
 
-        // If this is a JDateChooser, also style the calendar popup
+        // If this is a JDateChooser, style using JCalendar's direct API
         if (dateChooser instanceof JDateChooser) {
             JDateChooser chooser = (JDateChooser) dateChooser;
 
-            // Style the calendar panel
-            if (chooser.getJCalendar() != null) {
-                styleCalendarPanel(chooser.getJCalendar());
+            // Get the JCalendar and style it directly
+            com.toedter.calendar.JCalendar calendar = chooser.getJCalendar();
+            if (calendar != null) {
+                styleJCalendarDirect(calendar);
             }
 
-            // Add listener to style popup when calendar changes
-            chooser.addPropertyChangeListener("calendar", new PropertyChangeListener() {
-                @Override
-                public void propertyChange(PropertyChangeEvent evt) {
-                    if (chooser.getJCalendar() != null) {
-                        styleCalendarPanel(chooser.getJCalendar());
-                    }
-                }
-            });
-
-            // Style the calendar button
+            // Style the calendar button and add click listener
             for (Component c : chooser.getComponents()) {
                 if (c instanceof JButton) {
                     JButton calBtn = (JButton) c;
                     calBtn.setBackground(PRIMARY);
                     calBtn.setBorder(BorderFactory.createLineBorder(BORDER));
+
+                    // Re-style the calendar each time popup is shown
+                    calBtn.addActionListener(e -> {
+                        SwingUtilities.invokeLater(() -> {
+                            if (chooser.getJCalendar() != null) {
+                                styleJCalendarDirect(chooser.getJCalendar());
+                            }
+                            // Also find and style popup windows
+                            for (Window window : Window.getWindows()) {
+                                if (window.isVisible() && window.getClass().getName().contains("Popup")) {
+                                    stylePopupWindowDeep(window);
+                                }
+                                if (window instanceof JWindow && window.isVisible()) {
+                                    stylePopupWindowDeep(window);
+                                }
+                            }
+                        });
+                    });
                 }
             }
+        }
+    }
+
+    /**
+     * Style JCalendar using its direct API methods.
+     */
+    private static void styleJCalendarDirect(com.toedter.calendar.JCalendar calendar) {
+        // Main calendar background
+        calendar.setBackground(BACKGROUND_SECONDARY);
+        calendar.setForeground(TEXT_PRIMARY);
+
+        // Style the day chooser
+        com.toedter.calendar.JDayChooser dayChooser = calendar.getDayChooser();
+        if (dayChooser != null) {
+            dayChooser.setBackground(BACKGROUND_SECONDARY);
+            dayChooser.setForeground(TEXT_PRIMARY);
+            dayChooser.setSundayForeground(DANGER);
+            dayChooser.setWeekdayForeground(TEXT_PRIMARY);
+            dayChooser.setDecorationBackgroundColor(BACKGROUND_TERTIARY);
+
+            // Style all day buttons
+            for (Component comp : dayChooser.getComponents()) {
+                styleCalendarComponentDeep(comp);
+            }
+        }
+
+        // Style the month chooser
+        com.toedter.calendar.JMonthChooser monthChooser = calendar.getMonthChooser();
+        if (monthChooser != null) {
+            monthChooser.setBackground(BACKGROUND_TERTIARY);
+            monthChooser.setForeground(TEXT_PRIMARY);
+
+            // Style the combo box inside month chooser
+            for (Component comp : monthChooser.getComponents()) {
+                if (comp instanceof JComboBox) {
+                    JComboBox<?> combo = (JComboBox<?>) comp;
+                    combo.setBackground(BACKGROUND_TERTIARY);
+                    combo.setForeground(TEXT_PRIMARY);
+                    combo.setRenderer(createDarkListCellRenderer());
+                }
+                comp.setBackground(BACKGROUND_TERTIARY);
+                comp.setForeground(TEXT_PRIMARY);
+            }
+        }
+
+        // Style the year chooser
+        com.toedter.calendar.JYearChooser yearChooser = calendar.getYearChooser();
+        if (yearChooser != null) {
+            yearChooser.setBackground(BACKGROUND_TERTIARY);
+            yearChooser.setForeground(TEXT_PRIMARY);
+
+            // Style spinner inside year chooser
+            for (Component comp : yearChooser.getComponents()) {
+                if (comp instanceof JSpinner) {
+                    styleSpinner((JSpinner) comp);
+                }
+                comp.setBackground(BACKGROUND_TERTIARY);
+                comp.setForeground(TEXT_PRIMARY);
+            }
+        }
+
+        // Recursively style everything else
+        styleCalendarComponentDeep(calendar);
+    }
+
+    /**
+     * Create a dark-themed list cell renderer for combo boxes.
+     */
+    private static DefaultListCellRenderer createDarkListCellRenderer() {
+        return new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value,
+                    int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                list.setBackground(BACKGROUND_SECONDARY);
+                if (isSelected) {
+                    setBackground(PRIMARY);
+                    setForeground(TEXT_PRIMARY);
+                } else {
+                    setBackground(BACKGROUND_SECONDARY);
+                    setForeground(TEXT_PRIMARY);
+                }
+                return this;
+            }
+        };
+    }
+
+    /**
+     * Deep style for calendar components.
+     */
+    private static void styleCalendarComponentDeep(Component comp) {
+        if (comp == null) return;
+
+        comp.setBackground(BACKGROUND_SECONDARY);
+        comp.setForeground(TEXT_PRIMARY);
+
+        if (comp instanceof JPanel) {
+            ((JPanel) comp).setOpaque(true);
+            ((JPanel) comp).setBackground(BACKGROUND_SECONDARY);
+        }
+
+        if (comp instanceof JButton) {
+            JButton btn = (JButton) comp;
+            btn.setBackground(BACKGROUND_TERTIARY);
+            btn.setForeground(TEXT_PRIMARY);
+            btn.setOpaque(true);
+            btn.setBorderPainted(true);
+        }
+
+        if (comp instanceof JComboBox) {
+            JComboBox<?> combo = (JComboBox<?>) comp;
+            combo.setBackground(BACKGROUND_TERTIARY);
+            combo.setForeground(TEXT_PRIMARY);
+            combo.setRenderer(createDarkListCellRenderer());
+        }
+
+        if (comp instanceof JSpinner) {
+            styleSpinner((JSpinner) comp);
+        }
+
+        if (comp instanceof JTextField) {
+            JTextField tf = (JTextField) comp;
+            tf.setBackground(BACKGROUND_TERTIARY);
+            tf.setForeground(TEXT_PRIMARY);
+            tf.setCaretColor(SUCCESS);
+        }
+
+        if (comp instanceof JLabel) {
+            ((JLabel) comp).setForeground(TEXT_PRIMARY);
+            ((JLabel) comp).setBackground(BACKGROUND_SECONDARY);
+        }
+
+        if (comp instanceof Container) {
+            for (Component child : ((Container) comp).getComponents()) {
+                styleCalendarComponentDeep(child);
+            }
+        }
+    }
+
+    /**
+     * Style popup window deeply.
+     */
+    private static void stylePopupWindowDeep(Window window) {
+        window.setBackground(BACKGROUND_SECONDARY);
+        for (Component comp : window.getComponents()) {
+            styleCalendarComponentDeep(comp);
         }
     }
 
@@ -497,12 +775,52 @@ public class DarkTheme {
             comp.setForeground(TEXT_PRIMARY);
         }
 
-        // Style buttons in calendar (day buttons)
+        // Style combo boxes in calendar (month dropdown)
+        if (comp instanceof JComboBox) {
+            JComboBox<?> combo = (JComboBox<?>) comp;
+            combo.setBackground(BACKGROUND_TERTIARY);
+            combo.setForeground(TEXT_PRIMARY);
+            combo.setBorder(BorderFactory.createLineBorder(BORDER));
+            // Style the dropdown list
+            combo.setRenderer(new DefaultListCellRenderer() {
+                @Override
+                public Component getListCellRendererComponent(JList<?> list, Object value,
+                        int index, boolean isSelected, boolean cellHasFocus) {
+                    super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                    if (isSelected) {
+                        setBackground(PRIMARY);
+                        setForeground(TEXT_PRIMARY);
+                    } else {
+                        setBackground(BACKGROUND_SECONDARY);
+                        setForeground(TEXT_PRIMARY);
+                    }
+                    setBorder(BorderFactory.createEmptyBorder(4, 8, 4, 8));
+                    return this;
+                }
+            });
+        }
+
+        // Style spinners in calendar (year spinner)
+        if (comp instanceof JSpinner) {
+            styleSpinner((JSpinner) comp);
+        }
+
+        // Style buttons in calendar (day buttons and navigation buttons)
         if (comp instanceof JButton) {
             JButton btn = (JButton) comp;
             btn.setBackground(BACKGROUND_TERTIARY);
             btn.setForeground(TEXT_PRIMARY);
             btn.setBorder(BorderFactory.createLineBorder(BORDER));
+            btn.setFocusPainted(false);
+        }
+
+        // Style text fields
+        if (comp instanceof JTextField) {
+            JTextField tf = (JTextField) comp;
+            tf.setBackground(BACKGROUND_TERTIARY);
+            tf.setForeground(TEXT_PRIMARY);
+            tf.setCaretColor(SUCCESS);
+            tf.setBorder(BorderFactory.createEmptyBorder(2, 4, 2, 4));
         }
 
         // Recurse into children
