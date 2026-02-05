@@ -565,10 +565,8 @@ public class DarkTheme {
             // Style the combo box inside month chooser
             for (Component comp : monthChooser.getComponents()) {
                 if (comp instanceof JComboBox) {
-                    JComboBox<?> combo = (JComboBox<?>) comp;
-                    combo.setBackground(BACKGROUND_TERTIARY);
-                    combo.setForeground(TEXT_PRIMARY);
-                    combo.setRenderer(createDarkListCellRenderer());
+                    // Use full styleComboBox to get proper dark popup styling
+                    styleComboBox((JComboBox<?>) comp);
                 }
                 comp.setBackground(BACKGROUND_TERTIARY);
                 comp.setForeground(TEXT_PRIMARY);
