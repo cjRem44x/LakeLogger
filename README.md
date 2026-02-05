@@ -35,6 +35,17 @@ A sleek, dark-themed desktop application for bass fishing enthusiasts to log cat
 - 🎯 Custom-styled components (buttons, dropdowns, scrollbars)
 - 📱 Responsive layout
 
+## 📸 Screenshots
+
+### Log New Catch
+![Log New Catch](res/images/captures/java_5LhkEy2Ayu.png)
+
+### View Catches
+![View Catches](res/images/captures/java_G3kQQsqi23.png)
+
+### Statistics & Analytics
+![Statistics & Analytics](res/images/captures/java_UytdlyOvZy.png)
+
 ## 📋 Requirements
 
 - ☕ **Java 17** or later
