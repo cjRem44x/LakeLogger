@@ -176,26 +176,80 @@ public class MainFrame extends JFrame {
         gbc.gridx = 0;
         gbc.gridy = 0;
 
-        // App icon from loaded image
-        if (appIcon != null) {
-            Image scaledIcon = appIcon.getScaledInstance(32, 32, Image.SCALE_SMOOTH);
-            JLabel iconLabel = new JLabel(new ImageIcon(scaledIcon));
-            bannerPanel.add(iconLabel, gbc);
-        } else {
-            JLabel iconLabel = new JLabel("\uD83C\uDFA3");
-            iconLabel.setFont(new Font(DarkTheme.EMOJI_FONT_NAME, Font.PLAIN, 24));
-            bannerPanel.add(iconLabel, gbc);
-        }
+        // Title with box frame and underline
+        JLabel titleLabel = new JLabel("Lake Logger") {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        gbc.gridy = 1;
-        gbc.insets = new Insets(6, 15, 0, 15);
-        JLabel titleLabel = new JLabel("Lake Logger");
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
+                // Outer glow effect
+                for (int i = 4; i >= 1; i--) {
+                    g2d.setColor(new Color(DarkTheme.SUCCESS.getRed(), DarkTheme.SUCCESS.getGreen(), DarkTheme.SUCCESS.getBlue(), 15 * i));
+                    g2d.setStroke(new BasicStroke(i * 2f));
+                    g2d.drawRoundRect(i, i, getWidth() - 1 - i * 2, getHeight() - 1 - i * 2, 10, 10);
+                }
+
+                // Main box frame with gradient stroke
+                g2d.setColor(DarkTheme.SUCCESS);
+                g2d.setStroke(new BasicStroke(2f));
+                g2d.drawRoundRect(2, 2, getWidth() - 5, getHeight() - 5, 8, 8);
+
+                // Inner highlight
+                g2d.setColor(new Color(255, 255, 255, 60));
+                g2d.setStroke(new BasicStroke(1f));
+                g2d.drawRoundRect(4, 4, getWidth() - 9, getHeight() - 9, 6, 6);
+
+                // Corner accents
+                g2d.setColor(DarkTheme.SUCCESS);
+                g2d.setStroke(new BasicStroke(2.5f));
+                int cornerLen = 12;
+                // Top-left
+                g2d.drawLine(2, 10, 2, 2); g2d.drawLine(2, 2, 10, 2);
+                // Top-right
+                g2d.drawLine(getWidth() - 12, 2, getWidth() - 4, 2); g2d.drawLine(getWidth() - 4, 2, getWidth() - 4, 10);
+                // Bottom-left
+                g2d.drawLine(2, getHeight() - 12, 2, getHeight() - 4); g2d.drawLine(2, getHeight() - 4, 10, getHeight() - 4);
+                // Bottom-right
+                g2d.drawLine(getWidth() - 12, getHeight() - 4, getWidth() - 4, getHeight() - 4); g2d.drawLine(getWidth() - 4, getHeight() - 12, getWidth() - 4, getHeight() - 4);
+
+                // Draw text shadow/glow
+                FontMetrics fm = g2d.getFontMetrics(getFont());
+                int textWidth = fm.stringWidth(getText());
+                int textX = (getWidth() - textWidth) / 2;
+                int textY = fm.getAscent() + (getHeight() - fm.getHeight()) / 2;
+
+                // Text glow
+                g2d.setFont(getFont());
+                for (int i = 3; i >= 1; i--) {
+                    g2d.setColor(new Color(DarkTheme.SUCCESS.getRed(), DarkTheme.SUCCESS.getGreen(), DarkTheme.SUCCESS.getBlue(), 30 * i));
+                    g2d.drawString(getText(), textX - i, textY);
+                    g2d.drawString(getText(), textX + i, textY);
+                    g2d.drawString(getText(), textX, textY - i);
+                    g2d.drawString(getText(), textX, textY + i);
+                }
+
+                // Gradient underline
+                int underlineY = getHeight() - 10;
+                GradientPaint underlineGradient = new GradientPaint(
+                        textX, 0, new Color(DarkTheme.SUCCESS.getRed(), DarkTheme.SUCCESS.getGreen(), DarkTheme.SUCCESS.getBlue(), 50),
+                        textX + textWidth / 2, 0, DarkTheme.SUCCESS, true);
+                g2d.setPaint(underlineGradient);
+                g2d.setStroke(new BasicStroke(3f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                g2d.drawLine(textX, underlineY, textX + textWidth, underlineY);
+
+                g2d.dispose();
+                super.paintComponent(g);
+            }
+        };
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 26));
         titleLabel.setForeground(Color.WHITE);
+        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        titleLabel.setBorder(BorderFactory.createEmptyBorder(12, 20, 16, 20));
         bannerPanel.add(titleLabel, gbc);
 
-        gbc.gridy = 2;
-        gbc.insets = new Insets(2, 15, 0, 15);
+        gbc.gridy = 1;
+        gbc.insets = new Insets(8, 15, 0, 15);
         JLabel subtitleLabel = new JLabel("Bass Fishing Tracker");
         subtitleLabel.setFont(new Font("Segoe UI", Font.PLAIN, 10));
         subtitleLabel.setForeground(new Color(160, 160, 160));

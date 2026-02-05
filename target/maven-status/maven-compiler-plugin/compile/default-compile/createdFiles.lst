@@ -26,6 +26,7 @@ com\lakelogger\service\AnalyticsService$WeatherStats.class
 com\lakelogger\ui\panels\LogCatchPanel.class
 com\lakelogger\ui\panels\StatsPanel$1.class
 com\lakelogger\ui\theme\DarkTheme$AnimatedBackgroundPanel$Particle.class
+com\lakelogger\ui\MainFrame$6.class
 com\lakelogger\ui\theme\DarkTheme$ThemedScrollBarUI.class
 com\lakelogger\model\Location.class
 com\lakelogger\ui\theme\DarkTheme$3.class
