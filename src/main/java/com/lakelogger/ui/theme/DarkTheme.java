@@ -152,11 +152,23 @@ public class DarkTheme {
      * Apply dark theme to the entire application.
      */
     public static void apply() {
-        try {
-            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-        } catch (Exception e) {
-            e.printStackTrace();
+        // FlatDarkLaf provides rounded corners and a modern Swing look; fall back gracefully
+        if (!com.formdev.flatlaf.FlatDarkLaf.setup()) {
+            try {
+                UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
+
+        // Rounded-corner radii — FlatLaf reads these at component paint time
+        UIManager.put("Component.arc",              scaled(10));
+        UIManager.put("TextComponent.arc",          scaled(10));
+        UIManager.put("Component.borderColor",      new ColorUIResource(BORDER));
+        UIManager.put("Component.focusedBorderColor", new ColorUIResource(SUCCESS));
+        UIManager.put("Button.arc",                 scaled(10));
+        UIManager.put("ScrollBar.thumbArc",         999);  // pill-shaped thumb
+        UIManager.put("ScrollBar.trackArc",         999);
 
         // Panel backgrounds
         UIManager.put("Panel.background", new ColorUIResource(BACKGROUND));
@@ -170,9 +182,7 @@ public class DarkTheme {
         UIManager.put("TextField.selectionForeground", new ColorUIResource(TEXT_PRIMARY));
         UIManager.put("TextField.inactiveBackground", new ColorUIResource(BACKGROUND_TERTIARY));
         UIManager.put("TextField.inactiveForeground", new ColorUIResource(TEXT_SECONDARY));
-        UIManager.put("TextField.border", BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(BORDER),
-                BorderFactory.createEmptyBorder(5, 8, 5, 8)));
+        UIManager.put("TextField.border", BorderFactory.createEmptyBorder(scaled(5), scaled(8), scaled(5), scaled(8)));
 
         // Text areas - dark theme
         UIManager.put("TextArea.background", new ColorUIResource(BACKGROUND_TERTIARY));
@@ -188,9 +198,7 @@ public class DarkTheme {
         UIManager.put("FormattedTextField.selectionBackground", new ColorUIResource(PRIMARY));
         UIManager.put("FormattedTextField.selectionForeground", new ColorUIResource(TEXT_PRIMARY));
         UIManager.put("FormattedTextField.inactiveBackground", new ColorUIResource(BACKGROUND_TERTIARY));
-        UIManager.put("FormattedTextField.border", BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(BORDER),
-                BorderFactory.createEmptyBorder(5, 8, 5, 8)));
+        UIManager.put("FormattedTextField.border", BorderFactory.createEmptyBorder(scaled(5), scaled(8), scaled(5), scaled(8)));
 
         // Combo boxes - styled with accent colors
         UIManager.put("ComboBox.background", new ColorUIResource(BACKGROUND_TERTIARY));
@@ -247,7 +255,7 @@ public class DarkTheme {
         // Spinners - fully themed
         UIManager.put("Spinner.background", new ColorUIResource(BACKGROUND_TERTIARY));
         UIManager.put("Spinner.foreground", new ColorUIResource(TEXT_PRIMARY));
-        UIManager.put("Spinner.border", BorderFactory.createLineBorder(BORDER));
+        UIManager.put("Spinner.border", BorderFactory.createEmptyBorder());
         UIManager.put("Spinner.arrowButtonBackground", new ColorUIResource(PRIMARY));
         UIManager.put("Spinner.arrowButtonBorder", BorderFactory.createLineBorder(BORDER));
         UIManager.put("Spinner.editorBackground", new ColorUIResource(BACKGROUND_TERTIARY));
@@ -518,9 +526,8 @@ public class DarkTheme {
         field.setSelectionColor(PRIMARY);
         field.setSelectedTextColor(TEXT_PRIMARY);
         field.setFont(FONT_REGULAR);
-        field.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(BORDER),
-                BorderFactory.createEmptyBorder(8, 10, 8, 10)));
+        // EmptyBorder for inner padding; FlatLaf paints the rounded outline via its UI delegate
+        field.setBorder(BorderFactory.createEmptyBorder(scaled(8), scaled(10), scaled(8), scaled(10)));
     }
 
     /**
@@ -529,7 +536,7 @@ public class DarkTheme {
     public static void styleSpinner(JSpinner spinner) {
         spinner.setBackground(BACKGROUND_TERTIARY);
         spinner.setForeground(TEXT_PRIMARY);
-        spinner.setBorder(BorderFactory.createLineBorder(BORDER));
+        spinner.setBorder(BorderFactory.createEmptyBorder());
 
         // Style the editor (text field part)
         JComponent editor = spinner.getEditor();
@@ -1313,6 +1320,30 @@ public class DarkTheme {
         button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         button.setPreferredSize(new Dimension(scaled(130), scaled(40)));
         return button;
+    }
+
+    /**
+     * Walk the component tree and rescale any explicitly-set font so text grows and
+     * shrinks with Ctrl +/-. Stores the unscaled base size as a client property on the
+     * first visit so repeated calls always derive from the original (not accumulated) size.
+     */
+    public static void scaleFontTree(Component root) {
+        if (root == null) return;
+        Font f = root.getFont();
+        if (f != null && root instanceof JComponent jc) {
+            Float storedBase = (Float) jc.getClientProperty("_baseFontSz");
+            if (storedBase == null) {
+                // First visit: record unscaled size (current size ÷ current scale)
+                storedBase = (float) (f.getSize2D() / UI_SCALE);
+                jc.putClientProperty("_baseFontSz", storedBase);
+            }
+            jc.setFont(f.deriveFont(storedBase * (float) UI_SCALE));
+        }
+        if (root instanceof Container c) {
+            for (Component child : c.getComponents()) {
+                scaleFontTree(child);
+            }
+        }
     }
 
     /**

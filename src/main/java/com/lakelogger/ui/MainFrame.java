@@ -87,10 +87,21 @@ public class MainFrame extends JFrame {
      * Called after every Ctrl +/- zoom change.
      */
     private void rebuildUI() {
+        // Save before initializeUI() resets currentPanel to "log"
+        String savedPanel = currentPanel;
         getContentPane().removeAll();
         DarkTheme.apply();
         initializeUI();
-        showPanel(currentPanel);
+        showPanel(savedPanel);
+        // Show zoom % in title bar when not at default scale
+        double scale = DarkTheme.getScale();
+        if (Math.abs(scale - 1.0) > 0.01) {
+            setTitle(String.format("Lake Logger - Bass Fishing Log [%.0f%%]", scale * 100));
+        } else {
+            setTitle("Lake Logger - Bass Fishing Log");
+        }
+        // Belt-and-suspenders: walk the tree and rescale any font that got missed
+        DarkTheme.scaleFontTree(getContentPane());
         revalidate();
         repaint();
     }
