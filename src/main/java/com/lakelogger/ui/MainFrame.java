@@ -8,6 +8,7 @@ import com.lakelogger.ui.theme.DarkTheme;
 import javax.swing.*;
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -19,7 +20,6 @@ import java.io.InputStream;
  */
 public class MainFrame extends JFrame {
 
-    private static final int SIDEBAR_WIDTH = 240;
     private JPanel contentPanel;
     private JPanel sidebarPanel;
 
@@ -28,6 +28,8 @@ public class MainFrame extends JFrame {
     private StatsPanel statsPanel;
 
     private JPanel activeNavItem = null;
+    /** Name of the currently visible content panel — preserved across rebuildUI(). */
+    private String currentPanel = "log";
 
     private BufferedImage bannerImage;
     private BufferedImage iconImage;
@@ -35,17 +37,73 @@ public class MainFrame extends JFrame {
     public MainFrame() {
         setTitle("Lake Logger - Bass Fishing Log");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setMinimumSize(new Dimension(1280, 850));
+
+        // Size window relative to screen resolution so it fits any display
+        Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+        int w = Math.min(screen.width  - 100, Math.max(DarkTheme.scaled(1280), (int)(screen.width  * 0.78)));
+        int h = Math.min(screen.height - 80,  Math.max(DarkTheme.scaled(850),  (int)(screen.height * 0.82)));
+        setSize(w, h);
+        setMinimumSize(new Dimension(DarkTheme.scaled(900), DarkTheme.scaled(620)));
         setLocationRelativeTo(null);
 
         loadImages();
         DarkTheme.apply();
         initializeUI();
+        addZoomListener();
 
         // Set window icon
         if (iconImage != null) {
             setIconImage(iconImage);
         }
+    }
+
+    /**
+     * Register a global key dispatcher for Ctrl +/- (zoom in/out) and Ctrl 0 (reset).
+     * Triggers a full UI rebuild so every scaled dimension and font is updated.
+     */
+    private void addZoomListener() {
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(e -> {
+            if (e.getID() != KeyEvent.KEY_PRESSED || !e.isControlDown()) return false;
+            boolean changed = false;
+            int kc = e.getKeyCode();
+            if (kc == KeyEvent.VK_PLUS || kc == KeyEvent.VK_EQUALS || kc == KeyEvent.VK_ADD) {
+                changed = DarkTheme.scaleUp();
+            } else if (kc == KeyEvent.VK_MINUS || kc == KeyEvent.VK_SUBTRACT) {
+                changed = DarkTheme.scaleDown();
+            } else if (kc == KeyEvent.VK_0 || kc == KeyEvent.VK_NUMPAD0) {
+                DarkTheme.resetScale();
+                changed = true;
+            }
+            if (changed) {
+                e.consume();
+                SwingUtilities.invokeLater(MainFrame.this::rebuildUI);
+            }
+            return false;
+        });
+    }
+
+    /**
+     * Tear down and recreate all UI panels using the current DarkTheme scale.
+     * Called after every Ctrl +/- zoom change.
+     */
+    private void rebuildUI() {
+        // Save before initializeUI() resets currentPanel to "log"
+        String savedPanel = currentPanel;
+        getContentPane().removeAll();
+        DarkTheme.apply();
+        initializeUI();
+        showPanel(savedPanel);
+        // Show zoom % in title bar when not at default scale
+        double scale = DarkTheme.getScale();
+        if (Math.abs(scale - 1.0) > 0.01) {
+            setTitle(String.format("Lake Logger - Bass Fishing Log [%.0f%%]", scale * 100));
+        } else {
+            setTitle("Lake Logger - Bass Fishing Log");
+        }
+        // Belt-and-suspenders: walk the tree and rescale any font that got missed
+        DarkTheme.scaleFontTree(getContentPane());
+        revalidate();
+        repaint();
     }
 
     private void loadImages() {
@@ -123,8 +181,9 @@ public class MainFrame extends JFrame {
                 g2d.dispose();
             }
         };
+        int sw = DarkTheme.scaled(240); // sidebar width for this render pass
         sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
-        sidebar.setPreferredSize(new Dimension(SIDEBAR_WIDTH, 0));
+        sidebar.setPreferredSize(new Dimension(sw, 0));
         sidebar.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, DarkTheme.BORDER));
 
         // Banner image section
@@ -167,12 +226,12 @@ public class MainFrame extends JFrame {
             }
         };
         bannerPanel.setLayout(new GridBagLayout());
-        bannerPanel.setPreferredSize(new Dimension(SIDEBAR_WIDTH, 110));
-        bannerPanel.setMaximumSize(new Dimension(SIDEBAR_WIDTH, 110));
+        bannerPanel.setPreferredSize(new Dimension(sw, DarkTheme.scaled(110)));
+        bannerPanel.setMaximumSize(new Dimension(sw, DarkTheme.scaled(110)));
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(0, 15, 0, 15);
+        gbc.insets = new Insets(0, DarkTheme.scaled(15), 0, DarkTheme.scaled(15));
         gbc.gridx = 0;
         gbc.gridy = 0;
 
@@ -242,16 +301,16 @@ public class MainFrame extends JFrame {
                 super.paintComponent(g);
             }
         };
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 26));
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, DarkTheme.scaled(26)));
         titleLabel.setForeground(Color.WHITE);
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        titleLabel.setBorder(BorderFactory.createEmptyBorder(12, 20, 16, 20));
+        titleLabel.setBorder(BorderFactory.createEmptyBorder(DarkTheme.scaled(12), DarkTheme.scaled(20), DarkTheme.scaled(16), DarkTheme.scaled(20)));
         bannerPanel.add(titleLabel, gbc);
 
         gbc.gridy = 1;
-        gbc.insets = new Insets(8, 15, 0, 15);
+        gbc.insets = new Insets(DarkTheme.scaled(8), DarkTheme.scaled(15), 0, DarkTheme.scaled(15));
         JLabel subtitleLabel = new JLabel("Bass Fishing Tracker");
-        subtitleLabel.setFont(new Font("Segoe UI", Font.PLAIN, 10));
+        subtitleLabel.setFont(new Font("Segoe UI", Font.PLAIN, DarkTheme.scaled(10)));
         subtitleLabel.setForeground(new Color(160, 160, 160));
         bannerPanel.add(subtitleLabel, gbc);
 
@@ -273,19 +332,19 @@ public class MainFrame extends JFrame {
             }
         };
         dividerPanel.setOpaque(false);
-        dividerPanel.setMaximumSize(new Dimension(SIDEBAR_WIDTH, 1));
-        dividerPanel.setPreferredSize(new Dimension(SIDEBAR_WIDTH, 1));
+        dividerPanel.setMaximumSize(new Dimension(sw, 1));
+        dividerPanel.setPreferredSize(new Dimension(sw, 1));
         sidebar.add(dividerPanel);
 
-        sidebar.add(Box.createRigidArea(new Dimension(0, 25)));
+        sidebar.add(Box.createRigidArea(new Dimension(0, DarkTheme.scaled(25))));
 
         // Section label
         JLabel navLabel = new JLabel("  NAVIGATION");
-        navLabel.setFont(new Font("Segoe UI", Font.BOLD, 10));
+        navLabel.setFont(new Font("Segoe UI", Font.BOLD, DarkTheme.scaled(10)));
         navLabel.setForeground(DarkTheme.TEXT_MUTED);
         navLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        navLabel.setBorder(BorderFactory.createEmptyBorder(0, 20, 10, 0));
-        navLabel.setMaximumSize(new Dimension(SIDEBAR_WIDTH, 25));
+        navLabel.setBorder(BorderFactory.createEmptyBorder(0, DarkTheme.scaled(20), DarkTheme.scaled(10), 0));
+        navLabel.setMaximumSize(new Dimension(sw, DarkTheme.scaled(25)));
         sidebar.add(navLabel);
 
         // Navigation items
@@ -294,24 +353,24 @@ public class MainFrame extends JFrame {
         JPanel statsNav = createNavItem("Statistics", "stats", "\uD83D\uDCCA", "Analytics & insights");
 
         sidebar.add(logNav);
-        sidebar.add(Box.createRigidArea(new Dimension(0, 5)));
+        sidebar.add(Box.createRigidArea(new Dimension(0, DarkTheme.scaled(5))));
         sidebar.add(viewNav);
-        sidebar.add(Box.createRigidArea(new Dimension(0, 5)));
+        sidebar.add(Box.createRigidArea(new Dimension(0, DarkTheme.scaled(5))));
         sidebar.add(statsNav);
 
         sidebar.add(Box.createVerticalGlue());
 
         // Mountain decoration at bottom
-        JPanel mountainDecor = DarkTheme.createMountainDecoration(60);
-        mountainDecor.setMaximumSize(new Dimension(SIDEBAR_WIDTH, 60));
+        JPanel mountainDecor = DarkTheme.createMountainDecoration(DarkTheme.scaled(60));
+        mountainDecor.setMaximumSize(new Dimension(sw, DarkTheme.scaled(60)));
         sidebar.add(mountainDecor);
 
         // Footer
         JPanel footerPanel = new JPanel();
         footerPanel.setLayout(new BoxLayout(footerPanel, BoxLayout.Y_AXIS));
         footerPanel.setOpaque(false);
-        footerPanel.setBorder(BorderFactory.createEmptyBorder(10, 25, 20, 25));
-        footerPanel.setMaximumSize(new Dimension(SIDEBAR_WIDTH, 50));
+        footerPanel.setBorder(BorderFactory.createEmptyBorder(DarkTheme.scaled(10), DarkTheme.scaled(25), DarkTheme.scaled(20), DarkTheme.scaled(25)));
+        footerPanel.setMaximumSize(new Dimension(sw, DarkTheme.scaled(50)));
 
         JLabel versionLabel = new JLabel("v1.0.0");
         versionLabel.setFont(DarkTheme.FONT_SMALL);
@@ -370,16 +429,16 @@ public class MainFrame extends JFrame {
 
         navItem.setLayout(new BorderLayout());
         navItem.setOpaque(false);
-        navItem.setMaximumSize(new Dimension(SIDEBAR_WIDTH, 58));
-        navItem.setPreferredSize(new Dimension(SIDEBAR_WIDTH, 58));
+        navItem.setMaximumSize(new Dimension(DarkTheme.scaled(240), DarkTheme.scaled(58)));
+        navItem.setPreferredSize(new Dimension(DarkTheme.scaled(240), DarkTheme.scaled(58)));
         navItem.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
         // Left section with icon
-        JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 8));
+        JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, DarkTheme.scaled(20), DarkTheme.scaled(8)));
         leftPanel.setOpaque(false);
 
         JLabel iconLabel = new JLabel(icon);
-        iconLabel.setFont(new Font(DarkTheme.EMOJI_FONT_NAME, Font.PLAIN, 18));
+        iconLabel.setFont(new Font(DarkTheme.EMOJI_FONT_NAME, Font.PLAIN, DarkTheme.scaled(18)));
         iconLabel.setForeground(DarkTheme.TEXT_SECONDARY);
         leftPanel.add(iconLabel);
 
@@ -387,7 +446,7 @@ public class MainFrame extends JFrame {
         JPanel textPanel = new JPanel();
         textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
         textPanel.setOpaque(false);
-        textPanel.setBorder(BorderFactory.createEmptyBorder(8, 0, 8, 0));
+        textPanel.setBorder(BorderFactory.createEmptyBorder(DarkTheme.scaled(8), 0, DarkTheme.scaled(8), 0));
 
         JLabel textLabel = new JLabel(text);
         textLabel.setFont(DarkTheme.FONT_HEADING);
@@ -463,6 +522,7 @@ public class MainFrame extends JFrame {
     }
 
     private void showPanel(String name) {
+        currentPanel = name;
         CardLayout cl = (CardLayout) contentPanel.getLayout();
         cl.show(contentPanel, name);
 

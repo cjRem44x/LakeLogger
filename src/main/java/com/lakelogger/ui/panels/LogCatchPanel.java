@@ -48,7 +48,7 @@ public class LogCatchPanel extends JPanel {
         // Animated background as base layer
         JPanel animatedBg = DarkTheme.createAnimatedBackground();
         animatedBg.setLayout(new BorderLayout(20, 20));
-        animatedBg.setBorder(BorderFactory.createEmptyBorder(30, 40, 30, 40));
+        animatedBg.setBorder(BorderFactory.createEmptyBorder(DarkTheme.scaled(30), DarkTheme.scaled(40), DarkTheme.scaled(30), DarkTheme.scaled(40)));
         add(animatedBg, BorderLayout.CENTER);
 
         // Header with icon and subtitle
@@ -60,7 +60,7 @@ public class LogCatchPanel extends JPanel {
         titleRow.setOpaque(false);
 
         JLabel iconLabel = new JLabel("\uD83C\uDFA3 ");
-        iconLabel.setFont(new Font(DarkTheme.EMOJI_FONT_NAME, Font.PLAIN, 26));
+        iconLabel.setFont(new Font(DarkTheme.EMOJI_FONT_NAME, Font.PLAIN, DarkTheme.scaled(26)));
 
         JLabel titleLabel = new JLabel("Log New Catch");
         titleLabel.setFont(DarkTheme.FONT_TITLE);
@@ -72,7 +72,7 @@ public class LogCatchPanel extends JPanel {
         JLabel subtitleLabel = new JLabel("Record the details of your bass catch");
         subtitleLabel.setFont(DarkTheme.FONT_REGULAR);
         subtitleLabel.setForeground(DarkTheme.TEXT_MUTED);
-        subtitleLabel.setBorder(BorderFactory.createEmptyBorder(5, 0, 15, 0));
+        subtitleLabel.setBorder(BorderFactory.createEmptyBorder(DarkTheme.scaled(5), 0, DarkTheme.scaled(15), 0));
 
         headerPanel.add(titleRow);
         headerPanel.add(subtitleLabel);
@@ -82,7 +82,7 @@ public class LogCatchPanel extends JPanel {
         JPanel formCard = DarkTheme.createGlowCard(DarkTheme.SUCCESS);
         formCard.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.insets = new Insets(DarkTheme.scaled(10), DarkTheme.scaled(10), DarkTheme.scaled(10), DarkTheme.scaled(10));
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
@@ -94,7 +94,7 @@ public class LogCatchPanel extends JPanel {
         gbc.gridx = 1;
         dateChooser = new JDateChooser();
         dateChooser.setDate(new java.util.Date());
-        dateChooser.setPreferredSize(new Dimension(200, 35));
+        dateChooser.setPreferredSize(new Dimension(DarkTheme.scaled(200), DarkTheme.scaled(35)));
         DarkTheme.styleDateChooser(dateChooser);
         DarkTheme.styleDateChooser(dateChooser.getDateEditor().getUiComponent());
         formCard.add(dateChooser, gbc);
@@ -112,14 +112,14 @@ public class LogCatchPanel extends JPanel {
         if (hour12 == 0) hour12 = 12;
 
         hourSpinner = new JSpinner(new SpinnerNumberModel(hour12, 1, 12, 1));
-        hourSpinner.setPreferredSize(new Dimension(60, 35));
+        hourSpinner.setPreferredSize(new Dimension(DarkTheme.scaled(60), DarkTheme.scaled(35)));
         DarkTheme.styleSpinner(hourSpinner);
         timePanel.add(hourSpinner);
 
         timePanel.add(DarkTheme.createLabel(":"));
 
         minuteSpinner = new JSpinner(new SpinnerNumberModel(now.getMinute(), 0, 59, 1));
-        minuteSpinner.setPreferredSize(new Dimension(60, 35));
+        minuteSpinner.setPreferredSize(new Dimension(DarkTheme.scaled(60), DarkTheme.scaled(35)));
         JSpinner.NumberEditor minuteEditor = new JSpinner.NumberEditor(minuteSpinner, "00");
         minuteSpinner.setEditor(minuteEditor);
         DarkTheme.styleSpinner(minuteSpinner);
@@ -127,7 +127,7 @@ public class LogCatchPanel extends JPanel {
 
         amPmCombo = new JComboBox<>(new String[]{"AM", "PM"});
         amPmCombo.setSelectedItem(now.getHour() >= 12 ? "PM" : "AM");
-        amPmCombo.setPreferredSize(new Dimension(70, 35));
+        amPmCombo.setPreferredSize(new Dimension(DarkTheme.scaled(70), DarkTheme.scaled(35)));
         DarkTheme.styleComboBox(amPmCombo);
         timePanel.add(amPmCombo);
 
@@ -139,7 +139,7 @@ public class LogCatchPanel extends JPanel {
         formCard.add(DarkTheme.createLabel("Length (inches):"), gbc);
         gbc.gridx = 1;
         lengthSpinner = new JSpinner(new SpinnerNumberModel(12.0, 0.0, 36.0, 0.5));
-        lengthSpinner.setPreferredSize(new Dimension(100, 35));
+        lengthSpinner.setPreferredSize(new Dimension(DarkTheme.scaled(100), DarkTheme.scaled(35)));
         DarkTheme.styleSpinner(lengthSpinner);
         formCard.add(lengthSpinner, gbc);
         row++;
@@ -149,7 +149,7 @@ public class LogCatchPanel extends JPanel {
         formCard.add(DarkTheme.createLabel("Weight (lbs):"), gbc);
         gbc.gridx = 1;
         weightSpinner = new JSpinner(new SpinnerNumberModel(1.0, 0.0, 20.0, 0.25));
-        weightSpinner.setPreferredSize(new Dimension(100, 35));
+        weightSpinner.setPreferredSize(new Dimension(DarkTheme.scaled(100), DarkTheme.scaled(35)));
         DarkTheme.styleSpinner(weightSpinner);
         formCard.add(weightSpinner, gbc);
         row++;
@@ -162,13 +162,13 @@ public class LogCatchPanel extends JPanel {
         locationPanel.setBackground(DarkTheme.BACKGROUND_SECONDARY);
         locationCombo = new JComboBox<>();
         locationCombo.setEditable(true);
-        locationCombo.setPreferredSize(new Dimension(200, 35));
+        locationCombo.setPreferredSize(new Dimension(DarkTheme.scaled(200), DarkTheme.scaled(35)));
         DarkTheme.styleComboBox(locationCombo);
         loadLocations();
         locationPanel.add(locationCombo);
 
         JButton addLocationBtn = DarkTheme.createSecondaryButton("+");
-        addLocationBtn.setPreferredSize(new Dimension(40, 35));
+        addLocationBtn.setPreferredSize(new Dimension(DarkTheme.scaled(40), DarkTheme.scaled(35)));
         addLocationBtn.addActionListener(e -> addNewLocation());
         locationPanel.add(addLocationBtn);
         formCard.add(locationPanel, gbc);
@@ -181,7 +181,7 @@ public class LogCatchPanel extends JPanel {
         weatherCombo = new JComboBox<>(new String[]{
                 "Sunny", "Partly Cloudy", "Cloudy", "Overcast", "Rainy", "Stormy", "Windy", "Foggy"
         });
-        weatherCombo.setPreferredSize(new Dimension(200, 35));
+        weatherCombo.setPreferredSize(new Dimension(DarkTheme.scaled(200), DarkTheme.scaled(35)));
         DarkTheme.styleComboBox(weatherCombo);
         formCard.add(weatherCombo, gbc);
         row++;
@@ -191,7 +191,7 @@ public class LogCatchPanel extends JPanel {
         formCard.add(DarkTheme.createLabel("Temperature (°F):"), gbc);
         gbc.gridx = 1;
         tempSpinner = new JSpinner(new SpinnerNumberModel(70, 0, 120, 1));
-        tempSpinner.setPreferredSize(new Dimension(100, 35));
+        tempSpinner.setPreferredSize(new Dimension(DarkTheme.scaled(100), DarkTheme.scaled(35)));
         DarkTheme.styleSpinner(tempSpinner);
         formCard.add(tempSpinner, gbc);
         row++;
@@ -204,13 +204,13 @@ public class LogCatchPanel extends JPanel {
         baitPanel.setBackground(DarkTheme.BACKGROUND_SECONDARY);
         baitCombo = new JComboBox<>();
         baitCombo.setEditable(true);
-        baitCombo.setPreferredSize(new Dimension(200, 35));
+        baitCombo.setPreferredSize(new Dimension(DarkTheme.scaled(200), DarkTheme.scaled(35)));
         DarkTheme.styleComboBox(baitCombo);
         loadBaits();
         baitPanel.add(baitCombo);
 
         JButton addBaitBtn = DarkTheme.createSecondaryButton("+");
-        addBaitBtn.setPreferredSize(new Dimension(40, 35));
+        addBaitBtn.setPreferredSize(new Dimension(DarkTheme.scaled(40), DarkTheme.scaled(35)));
         addBaitBtn.addActionListener(e -> addNewBait());
         baitPanel.add(addBaitBtn);
         formCard.add(baitPanel, gbc);
@@ -226,7 +226,7 @@ public class LogCatchPanel extends JPanel {
         gbc.weighty = 1;
         notesArea = DarkTheme.createTextArea(4, 30);
         JScrollPane notesScroll = new JScrollPane(notesArea);
-        notesScroll.setPreferredSize(new Dimension(300, 100));
+        notesScroll.setPreferredSize(new Dimension(DarkTheme.scaled(300), DarkTheme.scaled(100)));
         notesScroll.setBorder(BorderFactory.createLineBorder(DarkTheme.BORDER));
         DarkTheme.styleScrollPane(notesScroll);
         formCard.add(notesScroll, gbc);
@@ -242,12 +242,12 @@ public class LogCatchPanel extends JPanel {
         buttonPanel.setOpaque(false);
 
         JButton saveButton = DarkTheme.createSuccessButton("Save Catch");
-        saveButton.setPreferredSize(new Dimension(140, 42));
+        saveButton.setPreferredSize(new Dimension(DarkTheme.scaled(140), DarkTheme.scaled(42)));
         saveButton.addActionListener(e -> saveCatch());
         buttonPanel.add(saveButton);
 
         JButton clearButton = DarkTheme.createSecondaryButton("Clear Form");
-        clearButton.setPreferredSize(new Dimension(130, 42));
+        clearButton.setPreferredSize(new Dimension(DarkTheme.scaled(130), DarkTheme.scaled(42)));
         clearButton.addActionListener(e -> clearForm());
         buttonPanel.add(clearButton);
 

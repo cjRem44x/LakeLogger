@@ -1,0 +1,9 @@
+As a Senior Software Engineer and Java Expert,
+
+-----------------------------
+Comment code well;
+TEST changes;
+Update docs and readme when needed;
+and commit all changes!
+
+NEVER ADD THIS FILE IN COMMITS.

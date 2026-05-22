@@ -43,7 +43,7 @@ public class ViewCatchesPanel extends JPanel {
         // Animated background
         JPanel animatedBg = DarkTheme.createAnimatedBackground();
         animatedBg.setLayout(new BorderLayout(20, 20));
-        animatedBg.setBorder(BorderFactory.createEmptyBorder(30, 40, 30, 40));
+        animatedBg.setBorder(BorderFactory.createEmptyBorder(DarkTheme.scaled(30), DarkTheme.scaled(40), DarkTheme.scaled(30), DarkTheme.scaled(40)));
         add(animatedBg, BorderLayout.CENTER);
 
         // Header with icon and subtitle
@@ -55,7 +55,7 @@ public class ViewCatchesPanel extends JPanel {
         titleRow.setOpaque(false);
 
         JLabel iconLabel = new JLabel("\uD83D\uDCCB ");
-        iconLabel.setFont(new Font(DarkTheme.EMOJI_FONT_NAME, Font.PLAIN, 26));
+        iconLabel.setFont(new Font(DarkTheme.EMOJI_FONT_NAME, Font.PLAIN, DarkTheme.scaled(26)));
 
         JLabel titleLabel = new JLabel("View Catches");
         titleLabel.setFont(DarkTheme.FONT_TITLE);
@@ -67,7 +67,7 @@ public class ViewCatchesPanel extends JPanel {
         JLabel subtitleLabel = new JLabel("Browse and manage your logged catches");
         subtitleLabel.setFont(DarkTheme.FONT_REGULAR);
         subtitleLabel.setForeground(DarkTheme.TEXT_MUTED);
-        subtitleLabel.setBorder(BorderFactory.createEmptyBorder(5, 0, 15, 0));
+        subtitleLabel.setBorder(BorderFactory.createEmptyBorder(DarkTheme.scaled(5), 0, DarkTheme.scaled(15), 0));
 
         headerPanel.add(titleRow);
         headerPanel.add(subtitleLabel);
@@ -87,13 +87,13 @@ public class ViewCatchesPanel extends JPanel {
 
         filterCard.add(DarkTheme.createLabel("Location:"));
         locationFilter = new JComboBox<>();
-        locationFilter.setPreferredSize(new Dimension(150, 32));
+        locationFilter.setPreferredSize(new Dimension(DarkTheme.scaled(150), DarkTheme.scaled(32)));
         DarkTheme.styleComboBox(locationFilter);
         filterCard.add(locationFilter);
 
         filterCard.add(DarkTheme.createLabel("Bait:"));
         baitFilter = new JComboBox<>();
-        baitFilter.setPreferredSize(new Dimension(150, 32));
+        baitFilter.setPreferredSize(new Dimension(DarkTheme.scaled(150), DarkTheme.scaled(32)));
         DarkTheme.styleComboBox(baitFilter);
         filterCard.add(baitFilter);
 
@@ -130,7 +130,7 @@ public class ViewCatchesPanel extends JPanel {
         catchTable.setSelectionBackground(DarkTheme.PRIMARY);
         catchTable.setSelectionForeground(DarkTheme.TEXT_PRIMARY);
         catchTable.setGridColor(DarkTheme.BORDER);
-        catchTable.setRowHeight(30);
+        catchTable.setRowHeight(DarkTheme.scaled(30));
         catchTable.setFont(DarkTheme.FONT_REGULAR);
         catchTable.getTableHeader().setBackground(DarkTheme.BACKGROUND_TERTIARY);
         catchTable.getTableHeader().setForeground(DarkTheme.TEXT_PRIMARY);
@@ -202,7 +202,7 @@ public class ViewCatchesPanel extends JPanel {
 
     private JDateChooser createDateChooser() {
         JDateChooser chooser = new JDateChooser();
-        chooser.setPreferredSize(new Dimension(130, 32));
+        chooser.setPreferredSize(new Dimension(DarkTheme.scaled(130), DarkTheme.scaled(32)));
         DarkTheme.styleDateChooser(chooser);
         DarkTheme.styleDateChooser(chooser.getDateEditor().getUiComponent());
         return chooser;

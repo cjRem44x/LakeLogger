@@ -64,6 +64,7 @@
                 <transformer>
                   <mainClass>com.lakelogger.LakeLoggerApp</mainClass>
                 </transformer>
+                <transformer />
               </transformers>
               <finalName>LakeLogger</finalName>
             </configuration>

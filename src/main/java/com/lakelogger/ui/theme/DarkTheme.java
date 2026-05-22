@@ -57,33 +57,118 @@ public class DarkTheme {
     public static final Color BORDER_LIGHT = new Color(0x3d, 0x47, 0x50);
     public static final Color BORDER_ACCENT = new Color(0x1b, 0x4d, 0x3e, 0x80);
 
-    // Fonts
-    public static final Font FONT_TITLE = new Font("Segoe UI", Font.BOLD, 28);
-    public static final Font FONT_SUBTITLE = new Font("Segoe UI", Font.BOLD, 18);
-    public static final Font FONT_HEADING = new Font("Segoe UI", Font.BOLD, 14);
-    public static final Font FONT_REGULAR = new Font("Segoe UI", Font.PLAIN, 13);
-    public static final Font FONT_SMALL = new Font("Segoe UI", Font.PLAIN, 11);
-    public static final Font FONT_LOGO = new Font("Segoe UI", Font.BOLD, 32);
-
-    // Emoji font - Arial Unicode MS has good emoji support
+    // Emoji font name
     public static final String EMOJI_FONT_NAME = "Arial Unicode MS";
-    public static final Font FONT_EMOJI_LARGE = new Font(EMOJI_FONT_NAME, Font.PLAIN, 24);
-    public static final Font FONT_EMOJI_MEDIUM = new Font(EMOJI_FONT_NAME, Font.PLAIN, 18);
-    public static final Font FONT_EMOJI_SMALL = new Font(EMOJI_FONT_NAME, Font.PLAIN, 14);
 
-    private DarkTheme() {
-        // Utility class
+    // Base (unscaled) font sizes — never modify these
+    private static final int BS_TITLE    = 28;
+    private static final int BS_SUBTITLE = 18;
+    private static final int BS_HEADING  = 14;
+    private static final int BS_REGULAR  = 13;
+    private static final int BS_SMALL    = 11;
+    private static final int BS_LOGO     = 32;
+    private static final int BS_E_LARGE  = 24;
+    private static final int BS_E_MEDIUM = 18;
+    private static final int BS_E_SMALL  = 14;
+
+    // UI scale factor — adjusted at runtime via Ctrl +/- (1.0 = 100%)
+    private static double UI_SCALE = 1.0;
+    private static final double MIN_SCALE  = 0.7;
+    private static final double MAX_SCALE  = 2.0;
+    private static final double SCALE_STEP = 0.1;
+
+    // Mutable scaled font fields — recomputed by recomputeFonts() on every scale change
+    public static Font FONT_TITLE        = new Font("Segoe UI", Font.BOLD,  BS_TITLE);
+    public static Font FONT_SUBTITLE     = new Font("Segoe UI", Font.BOLD,  BS_SUBTITLE);
+    public static Font FONT_HEADING      = new Font("Segoe UI", Font.BOLD,  BS_HEADING);
+    public static Font FONT_REGULAR      = new Font("Segoe UI", Font.PLAIN, BS_REGULAR);
+    public static Font FONT_SMALL        = new Font("Segoe UI", Font.PLAIN, BS_SMALL);
+    public static Font FONT_LOGO         = new Font("Segoe UI", Font.BOLD,  BS_LOGO);
+    public static Font FONT_EMOJI_LARGE  = new Font(EMOJI_FONT_NAME, Font.PLAIN, BS_E_LARGE);
+    public static Font FONT_EMOJI_MEDIUM = new Font(EMOJI_FONT_NAME, Font.PLAIN, BS_E_MEDIUM);
+    public static Font FONT_EMOJI_SMALL  = new Font(EMOJI_FONT_NAME, Font.PLAIN, BS_E_SMALL);
+
+    private DarkTheme() {}
+
+    // ==================== UI Scaling ====================
+
+    /**
+     * Scale a pixel dimension by the current UI scale factor.
+     * All hardcoded pixel sizes in the UI should pass through this.
+     */
+    public static int scaled(int px) {
+        return (int) Math.round(px * UI_SCALE);
+    }
+
+    /** Returns the current UI scale factor (1.0 = 100%). */
+    public static double getScale() { return UI_SCALE; }
+
+    /**
+     * Increase UI scale one step (Ctrl +).
+     * @return true if the scale actually changed
+     */
+    public static boolean scaleUp() {
+        if (UI_SCALE < MAX_SCALE - 0.01) {
+            UI_SCALE = Math.round((UI_SCALE + SCALE_STEP) * 10.0) / 10.0;
+            recomputeFonts();
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Decrease UI scale one step (Ctrl -).
+     * @return true if the scale actually changed
+     */
+    public static boolean scaleDown() {
+        if (UI_SCALE > MIN_SCALE + 0.01) {
+            UI_SCALE = Math.round((UI_SCALE - SCALE_STEP) * 10.0) / 10.0;
+            recomputeFonts();
+            return true;
+        }
+        return false;
+    }
+
+    /** Reset UI scale to 100% (Ctrl 0). */
+    public static void resetScale() {
+        UI_SCALE = 1.0;
+        recomputeFonts();
+    }
+
+    /** Recompute all FONT_* fields from base sizes × UI_SCALE. */
+    private static void recomputeFonts() {
+        FONT_TITLE        = new Font("Segoe UI", Font.BOLD,  scaled(BS_TITLE));
+        FONT_SUBTITLE     = new Font("Segoe UI", Font.BOLD,  scaled(BS_SUBTITLE));
+        FONT_HEADING      = new Font("Segoe UI", Font.BOLD,  scaled(BS_HEADING));
+        FONT_REGULAR      = new Font("Segoe UI", Font.PLAIN, scaled(BS_REGULAR));
+        FONT_SMALL        = new Font("Segoe UI", Font.PLAIN, scaled(BS_SMALL));
+        FONT_LOGO         = new Font("Segoe UI", Font.BOLD,  scaled(BS_LOGO));
+        FONT_EMOJI_LARGE  = new Font(EMOJI_FONT_NAME, Font.PLAIN, scaled(BS_E_LARGE));
+        FONT_EMOJI_MEDIUM = new Font(EMOJI_FONT_NAME, Font.PLAIN, scaled(BS_E_MEDIUM));
+        FONT_EMOJI_SMALL  = new Font(EMOJI_FONT_NAME, Font.PLAIN, scaled(BS_E_SMALL));
     }
 
     /**
      * Apply dark theme to the entire application.
      */
     public static void apply() {
-        try {
-            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-        } catch (Exception e) {
-            e.printStackTrace();
+        // FlatDarkLaf provides rounded corners and a modern Swing look; fall back gracefully
+        if (!com.formdev.flatlaf.FlatDarkLaf.setup()) {
+            try {
+                UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
+
+        // Rounded-corner radii — FlatLaf reads these at component paint time
+        UIManager.put("Component.arc",              scaled(10));
+        UIManager.put("TextComponent.arc",          scaled(10));
+        UIManager.put("Component.borderColor",      new ColorUIResource(BORDER));
+        UIManager.put("Component.focusedBorderColor", new ColorUIResource(SUCCESS));
+        UIManager.put("Button.arc",                 scaled(10));
+        UIManager.put("ScrollBar.thumbArc",         999);  // pill-shaped thumb
+        UIManager.put("ScrollBar.trackArc",         999);
 
         // Panel backgrounds
         UIManager.put("Panel.background", new ColorUIResource(BACKGROUND));
@@ -97,9 +182,7 @@ public class DarkTheme {
         UIManager.put("TextField.selectionForeground", new ColorUIResource(TEXT_PRIMARY));
         UIManager.put("TextField.inactiveBackground", new ColorUIResource(BACKGROUND_TERTIARY));
         UIManager.put("TextField.inactiveForeground", new ColorUIResource(TEXT_SECONDARY));
-        UIManager.put("TextField.border", BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(BORDER),
-                BorderFactory.createEmptyBorder(5, 8, 5, 8)));
+        UIManager.put("TextField.border", BorderFactory.createEmptyBorder(scaled(5), scaled(8), scaled(5), scaled(8)));
 
         // Text areas - dark theme
         UIManager.put("TextArea.background", new ColorUIResource(BACKGROUND_TERTIARY));
@@ -115,9 +198,7 @@ public class DarkTheme {
         UIManager.put("FormattedTextField.selectionBackground", new ColorUIResource(PRIMARY));
         UIManager.put("FormattedTextField.selectionForeground", new ColorUIResource(TEXT_PRIMARY));
         UIManager.put("FormattedTextField.inactiveBackground", new ColorUIResource(BACKGROUND_TERTIARY));
-        UIManager.put("FormattedTextField.border", BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(BORDER),
-                BorderFactory.createEmptyBorder(5, 8, 5, 8)));
+        UIManager.put("FormattedTextField.border", BorderFactory.createEmptyBorder(scaled(5), scaled(8), scaled(5), scaled(8)));
 
         // Combo boxes - styled with accent colors
         UIManager.put("ComboBox.background", new ColorUIResource(BACKGROUND_TERTIARY));
@@ -174,7 +255,7 @@ public class DarkTheme {
         // Spinners - fully themed
         UIManager.put("Spinner.background", new ColorUIResource(BACKGROUND_TERTIARY));
         UIManager.put("Spinner.foreground", new ColorUIResource(TEXT_PRIMARY));
-        UIManager.put("Spinner.border", BorderFactory.createLineBorder(BORDER));
+        UIManager.put("Spinner.border", BorderFactory.createEmptyBorder());
         UIManager.put("Spinner.arrowButtonBackground", new ColorUIResource(PRIMARY));
         UIManager.put("Spinner.arrowButtonBorder", BorderFactory.createLineBorder(BORDER));
         UIManager.put("Spinner.editorBackground", new ColorUIResource(BACKGROUND_TERTIARY));
@@ -184,14 +265,14 @@ public class DarkTheme {
         // Option panes (dialogs) - full theme support
         UIManager.put("OptionPane.background", new ColorUIResource(BACKGROUND_SECONDARY));
         UIManager.put("OptionPane.messageForeground", new ColorUIResource(TEXT_PRIMARY));
-        UIManager.put("OptionPane.messageFont", new Font(EMOJI_FONT_NAME, Font.PLAIN, 13));
-        UIManager.put("OptionPane.buttonFont", new Font(EMOJI_FONT_NAME, Font.BOLD, 12));
+        UIManager.put("OptionPane.messageFont", FONT_REGULAR);
+        UIManager.put("OptionPane.buttonFont", FONT_HEADING);
         UIManager.put("OptionPane.minimumSize", new Dimension(300, 100));
 
         // Dialog/OptionPane buttons
         UIManager.put("Button.background", new ColorUIResource(PRIMARY));
         UIManager.put("Button.foreground", new ColorUIResource(TEXT_PRIMARY));
-        UIManager.put("Button.font", new Font(EMOJI_FONT_NAME, Font.BOLD, 12));
+        UIManager.put("Button.font", FONT_HEADING);
         UIManager.put("Button.select", new ColorUIResource(PRIMARY_HOVER));
         UIManager.put("Button.focus", new ColorUIResource(SUCCESS));
         UIManager.put("Button.border", BorderFactory.createCompoundBorder(
@@ -308,7 +389,7 @@ public class DarkTheme {
         if (initialValue != null) {
             inputField.setText(initialValue);
         }
-        inputField.setPreferredSize(new Dimension(250, 35));
+        inputField.setPreferredSize(new Dimension(scaled(250), scaled(35)));
 
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBackground(BACKGROUND_SECONDARY);
@@ -355,10 +436,10 @@ public class DarkTheme {
             // Replace with styled button appearance
             btn.setBackground(PRIMARY);
             btn.setForeground(TEXT_PRIMARY);
-            btn.setFont(new Font(EMOJI_FONT_NAME, Font.BOLD, 12));
+            btn.setFont(FONT_HEADING);
             btn.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(BORDER),
-                BorderFactory.createEmptyBorder(8, 16, 8, 16)));
+                BorderFactory.createEmptyBorder(scaled(6), scaled(14), scaled(6), scaled(14))));
             btn.setFocusPainted(false);
             btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
@@ -444,10 +525,9 @@ public class DarkTheme {
         field.setCaretColor(SUCCESS);
         field.setSelectionColor(PRIMARY);
         field.setSelectedTextColor(TEXT_PRIMARY);
-        field.setFont(new Font(EMOJI_FONT_NAME, Font.PLAIN, 13));
-        field.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(BORDER),
-                BorderFactory.createEmptyBorder(8, 10, 8, 10)));
+        field.setFont(FONT_REGULAR);
+        // EmptyBorder for inner padding; FlatLaf paints the rounded outline via its UI delegate
+        field.setBorder(BorderFactory.createEmptyBorder(scaled(8), scaled(10), scaled(8), scaled(10)));
     }
 
     /**
@@ -456,7 +536,7 @@ public class DarkTheme {
     public static void styleSpinner(JSpinner spinner) {
         spinner.setBackground(BACKGROUND_TERTIARY);
         spinner.setForeground(TEXT_PRIMARY);
-        spinner.setBorder(BorderFactory.createLineBorder(BORDER));
+        spinner.setBorder(BorderFactory.createEmptyBorder());
 
         // Style the editor (text field part)
         JComponent editor = spinner.getEditor();
@@ -467,7 +547,7 @@ public class DarkTheme {
             tf.setCaretColor(SUCCESS);
             tf.setSelectionColor(PRIMARY);
             tf.setSelectedTextColor(TEXT_PRIMARY);
-            tf.setFont(new Font(EMOJI_FONT_NAME, Font.PLAIN, 13));
+            tf.setFont(FONT_REGULAR);
             tf.setBorder(BorderFactory.createEmptyBorder(2, 8, 2, 8));
         }
 
@@ -859,7 +939,7 @@ public class DarkTheme {
     public static void styleComboBox(JComboBox<?> combo) {
         combo.setBackground(BACKGROUND_TERTIARY);
         combo.setForeground(TEXT_PRIMARY);
-        combo.setFont(new Font(EMOJI_FONT_NAME, Font.PLAIN, 13));
+        combo.setFont(FONT_REGULAR);
         combo.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(BORDER),
             BorderFactory.createEmptyBorder(2, 5, 2, 5)));
@@ -914,7 +994,7 @@ public class DarkTheme {
                     int index, boolean isSelected, boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
-                setFont(new Font(EMOJI_FONT_NAME, Font.PLAIN, 13));
+                setFont(FONT_REGULAR);
 
                 if (isSelected) {
                     setBackground(PRIMARY);
@@ -939,7 +1019,7 @@ public class DarkTheme {
     public static JLabel createLabel(String text) {
         JLabel label = new JLabel(text);
         label.setForeground(TEXT_SECONDARY);
-        label.setFont(new Font(EMOJI_FONT_NAME, Font.PLAIN, 13));
+        label.setFont(FONT_REGULAR);
         return label;
     }
 
@@ -949,7 +1029,7 @@ public class DarkTheme {
     public static JLabel createColoredLabel(String text, Color color) {
         JLabel label = new JLabel(text);
         label.setForeground(color);
-        label.setFont(new Font(EMOJI_FONT_NAME, Font.PLAIN, 13));
+        label.setFont(FONT_REGULAR);
         return label;
     }
 
@@ -959,7 +1039,7 @@ public class DarkTheme {
     public static JLabel createHeaderLabel(String text) {
         JLabel label = new JLabel(text);
         label.setForeground(TEXT_PRIMARY);
-        label.setFont(new Font(EMOJI_FONT_NAME, Font.BOLD, 18));
+        label.setFont(FONT_SUBTITLE);
         return label;
     }
 
@@ -1224,7 +1304,7 @@ public class DarkTheme {
 
                 // Draw text with emoji font
                 g2d.setColor(TEXT_PRIMARY);
-                g2d.setFont(new Font(EMOJI_FONT_NAME, Font.BOLD, 13));
+                g2d.setFont(FONT_HEADING);
                 FontMetrics fm = g2d.getFontMetrics();
                 int x = (getWidth() - fm.stringWidth(getText())) / 2;
                 int y = (getHeight() + fm.getAscent() - fm.getDescent()) / 2 + (pressed ? 1 : -1);
@@ -1236,10 +1316,34 @@ public class DarkTheme {
         button.setContentAreaFilled(false);
         button.setBorderPainted(false);
         button.setFocusPainted(false);
-        button.setFont(new Font(EMOJI_FONT_NAME, Font.BOLD, 13));
+        button.setFont(FONT_HEADING);
         button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        button.setPreferredSize(new Dimension(130, 40));
+        button.setPreferredSize(new Dimension(scaled(130), scaled(40)));
         return button;
+    }
+
+    /**
+     * Walk the component tree and rescale any explicitly-set font so text grows and
+     * shrinks with Ctrl +/-. Stores the unscaled base size as a client property on the
+     * first visit so repeated calls always derive from the original (not accumulated) size.
+     */
+    public static void scaleFontTree(Component root) {
+        if (root == null) return;
+        Font f = root.getFont();
+        if (f != null && root instanceof JComponent jc) {
+            Float storedBase = (Float) jc.getClientProperty("_baseFontSz");
+            if (storedBase == null) {
+                // First visit: record unscaled size (current size ÷ current scale)
+                storedBase = (float) (f.getSize2D() / UI_SCALE);
+                jc.putClientProperty("_baseFontSz", storedBase);
+            }
+            jc.setFont(f.deriveFont(storedBase * (float) UI_SCALE));
+        }
+        if (root instanceof Container c) {
+            for (Component child : c.getComponents()) {
+                scaleFontTree(child);
+            }
+        }
     }
 
     /**
