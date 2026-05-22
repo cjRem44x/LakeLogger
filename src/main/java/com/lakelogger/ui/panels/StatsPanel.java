@@ -37,7 +37,7 @@ public class StatsPanel extends JPanel {
         // Animated background
         JPanel animatedBg = DarkTheme.createAnimatedBackground();
         animatedBg.setLayout(new BorderLayout(20, 20));
-        animatedBg.setBorder(BorderFactory.createEmptyBorder(30, 40, 30, 40));
+        animatedBg.setBorder(BorderFactory.createEmptyBorder(DarkTheme.scaled(30), DarkTheme.scaled(40), DarkTheme.scaled(30), DarkTheme.scaled(40)));
         add(animatedBg, BorderLayout.CENTER);
 
         // Header with icon and subtitle
@@ -52,7 +52,7 @@ public class StatsPanel extends JPanel {
         titleRow.setOpaque(false);
 
         JLabel iconLabel = new JLabel("\uD83D\uDCCA ");
-        iconLabel.setFont(new java.awt.Font(DarkTheme.EMOJI_FONT_NAME, java.awt.Font.PLAIN, 26));
+        iconLabel.setFont(new java.awt.Font(DarkTheme.EMOJI_FONT_NAME, java.awt.Font.PLAIN, DarkTheme.scaled(26)));
 
         JLabel titleLabel = new JLabel("Statistics & Analytics");
         titleLabel.setFont(DarkTheme.FONT_TITLE);
@@ -71,7 +71,7 @@ public class StatsPanel extends JPanel {
         headerPanel.add(titleSection, BorderLayout.WEST);
 
         JButton refreshBtn = DarkTheme.createInfoButton("Refresh");
-        refreshBtn.setPreferredSize(new Dimension(110, 36));
+        refreshBtn.setPreferredSize(new Dimension(DarkTheme.scaled(110), DarkTheme.scaled(36)));
         refreshBtn.addActionListener(e -> refresh());
         headerPanel.add(refreshBtn, BorderLayout.EAST);
 
@@ -100,9 +100,9 @@ public class StatsPanel extends JPanel {
         chartsContainer.add(Box.createRigidArea(new Dimension(0, 20)));
 
         // Charts row
-        JPanel chartsRow = new JPanel(new GridLayout(1, 2, 20, 0));
+        JPanel chartsRow = new JPanel(new GridLayout(1, 2, DarkTheme.scaled(20), 0));
         chartsRow.setOpaque(false);
-        chartsRow.setMaximumSize(new Dimension(Integer.MAX_VALUE, 350));
+        chartsRow.setMaximumSize(new Dimension(Integer.MAX_VALUE, DarkTheme.scaled(350)));
 
         chartsRow.add(createBaitChart());
         chartsRow.add(createTimeOfDayChart());
@@ -111,9 +111,9 @@ public class StatsPanel extends JPanel {
         chartsContainer.add(Box.createRigidArea(new Dimension(0, 20)));
 
         // Second row
-        JPanel chartsRow2 = new JPanel(new GridLayout(1, 2, 20, 0));
+        JPanel chartsRow2 = new JPanel(new GridLayout(1, 2, DarkTheme.scaled(20), 0));
         chartsRow2.setOpaque(false);
-        chartsRow2.setMaximumSize(new Dimension(Integer.MAX_VALUE, 350));
+        chartsRow2.setMaximumSize(new Dimension(Integer.MAX_VALUE, DarkTheme.scaled(350)));
 
         chartsRow2.add(createWeatherChart());
         chartsRow2.add(createLocationChart());
@@ -135,8 +135,8 @@ public class StatsPanel extends JPanel {
         SummaryStats stats = analyticsService.getSummaryStats();
 
         JPanel card = DarkTheme.createGlowCard(DarkTheme.SUCCESS);
-        card.setLayout(new GridLayout(2, 4, 15, 10));
-        card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 160));
+        card.setLayout(new GridLayout(2, 4, DarkTheme.scaled(15), DarkTheme.scaled(10)));
+        card.setMaximumSize(new Dimension(Integer.MAX_VALUE, DarkTheme.scaled(160)));
 
         card.add(createStatBox("Catches", String.valueOf(stats.totalCatches), DarkTheme.INFO, "\uD83C\uDFA3"));
         card.add(createStatBox("Total Wt", String.format("%.1f lb", stats.totalWeight), DarkTheme.SUCCESS, "\u2696\uFE0F"));
@@ -174,23 +174,21 @@ public class StatsPanel extends JPanel {
         box.setOpaque(false);
         box.setBorder(BorderFactory.createEmptyBorder(10, 8, 8, 8));
 
-        // Icon - smaller
+        // Icon
         JLabel iconLabel = new JLabel(icon);
-        iconLabel.setFont(new java.awt.Font(DarkTheme.EMOJI_FONT_NAME, java.awt.Font.PLAIN, 16));
+        iconLabel.setFont(new java.awt.Font(DarkTheme.EMOJI_FONT_NAME, java.awt.Font.PLAIN, DarkTheme.scaled(16)));
         iconLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         box.add(iconLabel);
 
         box.add(Box.createRigidArea(new Dimension(0, 3)));
 
-        // Value - smaller font
         JLabel valueLabel = new JLabel(value);
-        valueLabel.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 14));
+        valueLabel.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, DarkTheme.scaled(14)));
         valueLabel.setForeground(DarkTheme.TEXT_PRIMARY);
         valueLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // Label - smaller
         JLabel titleLabel = new JLabel(label);
-        titleLabel.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 10));
+        titleLabel.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, DarkTheme.scaled(10)));
         titleLabel.setForeground(DarkTheme.TEXT_SECONDARY);
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
@@ -333,7 +331,7 @@ public class StatsPanel extends JPanel {
     private JPanel createBaitStatsTable() {
         JPanel panel = DarkTheme.createSectionPanel("Bait Performance Details");
         panel.setLayout(new BorderLayout());
-        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 250));
+        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, DarkTheme.scaled(250)));
 
         String[] columns = {"Bait", "Catches", "Avg Weight (lbs)", "Avg Length (in)", "Max Weight (lbs)"};
         Object[][] data = analyticsService.getBaitAnalysis().entrySet().stream()
@@ -359,7 +357,7 @@ public class StatsPanel extends JPanel {
     private JPanel createLocationStatsTable() {
         JPanel panel = DarkTheme.createSectionPanel("Location Performance Details");
         panel.setLayout(new BorderLayout());
-        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 250));
+        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, DarkTheme.scaled(250)));
 
         String[] columns = {"Location", "Catches", "Avg Weight (lbs)", "Total Weight (lbs)", "Max Weight (lbs)"};
         Object[][] data = analyticsService.getLocationAnalysis().entrySet().stream()
@@ -389,7 +387,7 @@ public class StatsPanel extends JPanel {
         table.setSelectionBackground(DarkTheme.PRIMARY);
         table.setSelectionForeground(DarkTheme.TEXT_PRIMARY);
         table.setGridColor(DarkTheme.BORDER);
-        table.setRowHeight(28);
+        table.setRowHeight(DarkTheme.scaled(28));
         table.setFont(DarkTheme.FONT_REGULAR);
         table.getTableHeader().setBackground(DarkTheme.BACKGROUND_TERTIARY);
         table.getTableHeader().setForeground(DarkTheme.TEXT_PRIMARY);

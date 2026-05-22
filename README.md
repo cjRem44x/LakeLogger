@@ -33,7 +33,8 @@ A sleek, dark-themed desktop application for bass fishing enthusiasts to log cat
 - 🌙 Dark theme with green accents
 - ✨ Animated background with floating particles
 - 🎯 Custom-styled components (buttons, dropdowns, scrollbars)
-- 📱 Responsive layout
+- 📏 **UI Scaling** — Ctrl + / Ctrl - to zoom in/out, Ctrl 0 to reset (70%–200%)
+- 📱 Responsive layout that adapts to any screen resolution
 
 ## 📸 Screenshots
 
@@ -156,6 +157,16 @@ To backup your data, simply copy the `lakelogger.db` file to a safe location.
 | SQLite JDBC | 3.42.0 | Database driver |
 | JCalendar | 1.4 | Date picker component |
 | JFreeChart | 1.5.4 | Analytics charts |
+
+## ⌨️ Keyboard Shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| Ctrl + | Zoom in (increase UI scale) |
+| Ctrl - | Zoom out (decrease UI scale) |
+| Ctrl 0 | Reset UI scale to 100% |
+
+> UI scale range: 70% – 200%. Scale is applied instantly without restarting the app.
 
 ## 🔧 Troubleshooting
 
