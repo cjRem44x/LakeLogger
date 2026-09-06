@@ -1,5 +1,10 @@
 # 🎣 Lake Logger
 
+> [!IMPORTANT]
+> **Looking for the latest Lake Logger?** Visit [lakelogger.com](https://lakelogger.com).
+>
+> Lake Logger has been rebuilt as a modern web application using **Next.js, TypeScript, Tailwind CSS, and Supabase**. This repository remains available as a showcase of the original Java desktop application and its Maven-based build.
+
 A sleek, dark-themed desktop application for bass fishing enthusiasts to log catches, track patterns, and analyze fishing data.
 
 ![Java](https://img.shields.io/badge/Java-17+-orange)
